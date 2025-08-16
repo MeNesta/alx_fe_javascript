@@ -1,1 +1,0 @@
-Creating Dynamic Quote Generator
