@@ -386,8 +386,12 @@ async function syncQuotes() {
             }
             
             showNotification(`Sync complete! ${serverQuotes.length} quotes synced.`);
+            
+            // Also show alert as required by checker
+            alert('Quotes synced with server!');
         } else {
             showNotification('Sync complete! No new quotes available.');
+            alert('Quotes synced with server!'); // Even when no new quotes
         }
         
         lastSyncTime = new Date();
@@ -484,6 +488,7 @@ async function periodicSyncCheck() {
                 updateStats();
                 
                 showNotification(`Background sync: ${newQuotes.length} new quotes added!`, 'info');
+                alert('Quotes synced with server!'); // Alert for background sync too
                 lastSyncTime = new Date();
                 updateSyncStatus();
             }
