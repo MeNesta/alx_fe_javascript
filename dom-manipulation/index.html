@@ -6,19 +6,34 @@
   <title>Dynamic Quote Generator</title>
 </head>
 <body>
-  <h1>Dynamic Quote Generator</h1>
+   <div class="container">
+        <h1>Dynamic Quote Generator</h1>
+        
+        <div id="quoteDisplay" class="empty-state">
+            Click "Show New Quote" to display a random quote
+        </div>
+        
+        <div class="controls">
+            <button id="newQuote">Show New Quote</button>
+            
+            <div class="category-filter" id="categoryFilter">
+                <!-- Categories will be dynamically added here -->
+            </div>
+        </div>
 
-  <!-- Quote Display -->
-  <div id="quoteDisplay">Your quote will appear here...</div>
-  <button id="newQuote">Show New Quote</button>
+        <div class="add-quote-section">
+            <h3>Add Your Own Quote</h3>
+            <div class="form-group">
+                <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+                <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+                <button onclick="addQuote()">Add Quote</button>
+            </div>
+        </div>
 
-  <!-- Form to add new quotes -->
-  <div>
-    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-    <button onclick="addQuote()">Add Quote</button>
-  </div>
-
+        <div class="stats" id="stats">
+            <!-- Quote statistics will be shown here -->
+        </div>
+    </div>
   <script src="script.js"></script>
 </body>
 </html>
