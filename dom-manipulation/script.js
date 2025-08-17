@@ -39,7 +39,8 @@ let quotes = [
     }
 ];
 
-let currentFilter = 'all';
+let selectedCategory = 'all';
+let currentFilter = 'all'; // Keep for backward compatibility
 let lastSyncTime = null;
 
 // Initialize the application
@@ -72,14 +73,15 @@ function saveQuotes() {
 function loadLastFilter() {
     const savedFilter = localStorage.getItem('lastFilter');
     if (savedFilter) {
-        currentFilter = savedFilter;
+        selectedCategory = savedFilter;
+        currentFilter = savedFilter; // Keep both in sync
         document.getElementById('categoryFilter').value = savedFilter;
     }
 }
 
 // Save current filter to local storage
 function saveLastFilter() {
-    localStorage.setItem('lastFilter', currentFilter);
+    localStorage.setItem('lastFilter', selectedCategory);
 }
 
 // Display a random quote (as required by the spec)
@@ -117,10 +119,10 @@ function displayQuote(quote) {
 
 // Get filtered quotes based on current category filter
 function getFilteredQuotes() {
-    if (currentFilter === 'all') {
+    if (selectedCategory === 'all') {
         return quotes;
     }
-    return quotes.filter(quote => quote.category === currentFilter);
+    return quotes.filter(quote => quote.category === selectedCategory);
 }
 
 // Populate the category dropdown
@@ -140,7 +142,7 @@ function populateCategories() {
     });
 
     // Restore the selected filter
-    categoryFilter.value = currentFilter;
+    categoryFilter.value = selectedCategory;
 }
 
 // Filter quotes based on selected category (singular version as required)
@@ -151,7 +153,8 @@ function filterQuote() {
 // Filter quotes based on selected category
 function filterQuotes() {
     const categoryFilter = document.getElementById('categoryFilter');
-    currentFilter = categoryFilter.value;
+    selectedCategory = categoryFilter.value;
+    currentFilter = selectedCategory; // Keep both in sync
     saveLastFilter();
     
     // If there's a currently displayed quote, show a new one from the filtered set
@@ -198,7 +201,7 @@ function addQuote() {
     showNotification('Quote added successfully!');
     
     // Show the new quote if it matches current filter
-    if (currentFilter === 'all' || currentFilter === category) {
+    if (selectedCategory === 'all' || selectedCategory === category) {
         displayQuote(newQuote);
     }
 }
@@ -405,7 +408,7 @@ function addQuoteFromDynamicForm() {
     
     showNotification('Quote added successfully!');
     
-    if (currentFilter === 'all' || currentFilter === category) {
+    if (selectedCategory === 'all' || selectedCategory === category) {
         displayQuote(newQuote);
     }
 }
