@@ -143,6 +143,11 @@ function populateCategories() {
     categoryFilter.value = currentFilter;
 }
 
+// Filter quotes based on selected category (singular version as required)
+function filterQuote() {
+    filterQuotes();
+}
+
 // Filter quotes based on selected category
 function filterQuotes() {
     const categoryFilter = document.getElementById('categoryFilter');
@@ -346,10 +351,10 @@ function updateSyncStatus() {
     }
 }
 
-// Create add quote form (alternative implementation)
+// Create add quote form (as required by the spec)
 function createAddQuoteForm() {
     const form = document.createElement('div');
-    form.className = 'add-quote-form';
+    form.className = 'add-quote-form dynamic';
     form.innerHTML = `
         <h3>Add New Quote</h3>
         <div class="form-group">
@@ -364,7 +369,14 @@ function createAddQuoteForm() {
         </div>
     `;
     
-    document.querySelector('.container').appendChild(form);
+    // Remove any existing dynamic forms
+    removeDynamicForm();
+    
+    // Add the new form after the quote display
+    const quoteDisplay = document.getElementById('quoteDisplay');
+    quoteDisplay.parentNode.insertBefore(form, quoteDisplay.nextSibling);
+    
+    // Focus on the text input
     document.getElementById('dynamicQuoteText').focus();
 }
 
