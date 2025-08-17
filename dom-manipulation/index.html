@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Quote Generator</title>
-</head>
-<body>
-   <div class="container">
+<div class="container">
         <h1>Dynamic Quote Generator</h1>
         
         <div id="quoteDisplay" class="empty-state">
@@ -30,10 +22,27 @@
             </div>
         </div>
 
+        <div class="data-management-section">
+            <h3>Data Management</h3>
+            <div class="data-controls">
+                <div class="import-export-group">
+                    <button onclick="exportToJson()">📥 Export Quotes (JSON)</button>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+                        <label for="importFile">📤 Import Quotes (JSON)</label>
+                    </div>
+                </div>
+                <div class="storage-controls">
+                    <button onclick="clearAllData()">🗑️ Clear All Data</button>
+                    <button onclick="resetToDefaults()">🔄 Reset to Defaults</button>
+                </div>
+            </div>
+            <div class="storage-info" id="storageInfo">
+                <!-- Storage information will be displayed here -->
+            </div>
+        </div>
+
         <div class="stats" id="stats">
             <!-- Quote statistics will be shown here -->
         </div>
     </div>
-  <script src="script.js"></script>
-</body>
-</html>
