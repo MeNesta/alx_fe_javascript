@@ -82,6 +82,11 @@ function saveLastFilter() {
     localStorage.setItem('lastFilter', currentFilter);
 }
 
+// Display a random quote (as required by the spec)
+function displayRandomQuote() {
+    showRandomQuote();
+}
+
 // Show a random quote based on current filter
 function showRandomQuote() {
     const filteredQuotes = getFilteredQuotes();
@@ -220,4 +225,236 @@ function exportToJsonFile() {
     const link = document.createElement('a');
     link.href = url;
     link.download = `quotes_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(li
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    URL.revokeObjectURL(url);
+    showNotification('Quotes exported successfully!');
+}
+
+// Import quotes from JSON file
+function importFromJsonFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const fileReader = new FileReader();
+    fileReader.onload = function(event) {
+        try {
+            const importedQuotes = JSON.parse(event.target.result);
+            
+            // Validate imported data
+            if (!Array.isArray(importedQuotes)) {
+                throw new Error('Invalid file format');
+            }
+            
+            // Add IDs and timestamps if missing
+            importedQuotes.forEach(quote => {
+                if (!quote.id) quote.id = Date.now() + Math.random();
+                if (!quote.timestamp) quote.timestamp = Date.now();
+                if (!quote.author) quote.author = 'Unknown';
+            });
+            
+            // Merge with existing quotes (avoid duplicates)
+            const existingTexts = new Set(quotes.map(q => q.text));
+            const newQuotes = importedQuotes.filter(q => !existingTexts.has(q.text));
+            
+            quotes.push(...newQuotes);
+            saveQuotes();
+            populateCategories();
+            updateStats();
+            
+            showNotification(`${newQuotes.length} quotes imported successfully!`);
+        } catch (error) {
+            showNotification('Error importing file. Please check the file format.', 'error');
+        }
+        
+        // Reset file input
+        event.target.value = '';
+    };
+    fileReader.readAsText(file);
+}
+
+// Simulate server sync
+function syncWithServer() {
+    showNotification('Syncing with server...');
+    
+    // Add loading state to sync button
+    const syncButton = event.target;
+    syncButton.classList.add('loading');
+    syncButton.disabled = true;
+    
+    // Simulate API call delay
+    setTimeout(() => {
+        // Simulate receiving new quotes from server
+        const serverQuotes = [
+            {
+                id: Date.now() + 1000,
+                text: "The best time to plant a tree was 20 years ago. The second best time is now.",
+                category: "Wisdom",
+                author: "Chinese Proverb",
+                timestamp: Date.now()
+            },
+            {
+                id: Date.now() + 2000,
+                text: "Code is like humor. When you have to explain it, it's bad.",
+                category: "Programming",
+                author: "Cory House",
+                timestamp: Date.now()
+            }
+        ];
+        
+        // Simple conflict resolution: merge new quotes
+        const existingIds = new Set(quotes.map(q => q.id));
+        const newQuotes = serverQuotes.filter(q => !existingIds.has(q.id));
+        
+        if (newQuotes.length > 0) {
+            quotes.push(...newQuotes);
+            saveQuotes();
+            populateCategories();
+            updateStats();
+            showNotification(`Sync complete! ${newQuotes.length} new quotes received.`);
+        } else {
+            showNotification('Sync complete! No new quotes available.');
+        }
+        
+        lastSyncTime = new Date();
+        updateSyncStatus();
+        
+        // Remove loading state
+        syncButton.classList.remove('loading');
+        syncButton.disabled = false;
+    }, 1500);
+}
+
+// Auto sync (simplified version)
+function autoSync() {
+    // Only auto-sync if user has quotes and it's been more than 5 minutes
+    if (quotes.length > 5 && (!lastSyncTime || Date.now() - lastSyncTime > 300000)) {
+        console.log('Auto-syncing...');
+        // In a real app, this would be a background sync
+        lastSyncTime = new Date();
+        updateSyncStatus();
+    }
+}
+
+// Update sync status display
+function updateSyncStatus() {
+    const syncStatus = document.getElementById('syncStatus');
+    if (lastSyncTime) {
+        syncStatus.textContent = `Last sync: ${lastSyncTime.toLocaleTimeString()}`;
+    }
+}
+
+// Create add quote form (alternative implementation)
+function createAddQuoteForm() {
+    const form = document.createElement('div');
+    form.className = 'add-quote-form';
+    form.innerHTML = `
+        <h3>Add New Quote</h3>
+        <div class="form-group">
+            <input type="text" id="dynamicQuoteText" placeholder="Enter a new quote" />
+        </div>
+        <div class="form-group">
+            <input type="text" id="dynamicQuoteCategory" placeholder="Enter quote category" />
+        </div>
+        <div class="form-group">
+            <button onclick="addQuoteFromDynamicForm()">Add Quote</button>
+            <button onclick="removeDynamicForm()">Cancel</button>
+        </div>
+    `;
+    
+    document.querySelector('.container').appendChild(form);
+    document.getElementById('dynamicQuoteText').focus();
+}
+
+// Add quote from dynamically created form
+function addQuoteFromDynamicForm() {
+    const text = document.getElementById('dynamicQuoteText').value.trim();
+    const category = document.getElementById('dynamicQuoteCategory').value.trim();
+    
+    if (!text || !category) {
+        showNotification('Please enter both quote text and category.', 'error');
+        return;
+    }
+
+    const newQuote = {
+        id: Date.now(),
+        text: text,
+        category: category,
+        author: 'User',
+        timestamp: Date.now()
+    };
+
+    quotes.push(newQuote);
+    saveQuotes();
+    populateCategories();
+    removeDynamicForm();
+    
+    showNotification('Quote added successfully!');
+    
+    if (currentFilter === 'all' || currentFilter === category) {
+        displayQuote(newQuote);
+    }
+}
+
+// Remove dynamically created form
+function removeDynamicForm() {
+    const forms = document.querySelectorAll('.add-quote-form');
+    forms.forEach(form => {
+        if (form.id !== 'addQuoteForm') {
+            form.remove();
+        }
+    });
+}
+
+// Initialize the application when DOM is loaded
+document.addEventListener('DOMContentLoaded', init);
+
+// Handle keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'n' && e.ctrlKey) {
+        e.preventDefault();
+        showRandomQuote();
+    }
+    if (e.key === 'a' && e.ctrlKey) {
+        e.preventDefault();
+        toggleAddQuoteForm();
+    }
+    if (e.key === 'e' && e.ctrlKey) {
+        e.preventDefault();
+        exportToJsonFile();
+    }
+});
+
+// Handle form submission with Enter key
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const activeElement = document.activeElement;
+        if (activeElement.id === 'newQuoteText' || activeElement.id === 'newQuoteCategory') {
+            e.preventDefault();
+            addQuote();
+        }
+    }
+});
+
+// Utility function to generate random ID
+function generateRandomId() {
+    return Date.now() + Math.floor(Math.random() * 1000);
+}
+
+// Utility function to validate quote object
+function isValidQuote(quote) {
+    return quote && 
+           typeof quote.text === 'string' && 
+           typeof quote.category === 'string' && 
+           quote.text.trim().length > 0 && 
+           quote.category.trim().length > 0;
+}
+
+// Utility function to sanitize HTML content
+function sanitizeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
