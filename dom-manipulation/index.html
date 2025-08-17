@@ -1,48 +1,60 @@
-<div class="container">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Quote Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
         <h1>Dynamic Quote Generator</h1>
         
-        <div id="quoteDisplay" class="empty-state">
-            Click "Show New Quote" to display a random quote
+        <div class="notification" id="notification"></div>
+        
+        <div class="stats" id="stats">
+            <strong>Total Quotes: <span id="totalQuotes">0</span></strong> | 
+            <strong>Categories: <span id="totalCategories">0</span></strong>
         </div>
         
         <div class="controls">
-            <button id="newQuote">Show New Quote</button>
-            
-            <div class="category-filter" id="categoryFilter">
-                <!-- Categories will be dynamically added here -->
-            </div>
+            <select id="categoryFilter" onchange="filterQuotes()">
+                <option value="all">All Categories</option>
+            </select>
+            <button id="newQuote" onclick="showRandomQuote()">Show Random Quote</button>
+            <button onclick="toggleAddQuoteForm()">Add New Quote</button>
         </div>
-
-        <div class="add-quote-section">
-            <h3>Add Your Own Quote</h3>
+        
+        <div id="quoteDisplay">
+            <p>Click "Show Random Quote" to see a quote!</p>
+        </div>
+        
+        <div class="add-quote-form" id="addQuoteForm">
+            <h3>Add New Quote</h3>
             <div class="form-group">
                 <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+            </div>
+            <div class="form-group">
                 <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+            </div>
+            <div class="form-group">
                 <button onclick="addQuote()">Add Quote</button>
+                <button onclick="toggleAddQuoteForm()">Cancel</button>
             </div>
         </div>
-
-        <div class="data-management-section">
-            <h3>Data Management</h3>
-            <div class="data-controls">
-                <div class="import-export-group">
-                    <button onclick="exportToJson()">📥 Export Quotes (JSON)</button>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
-                        <label for="importFile">📤 Import Quotes (JSON)</label>
-                    </div>
-                </div>
-                <div class="storage-controls">
-                    <button onclick="clearAllData()">🗑️ Clear All Data</button>
-                    <button onclick="resetToDefaults()">🔄 Reset to Defaults</button>
-                </div>
-            </div>
-            <div class="storage-info" id="storageInfo">
-                <!-- Storage information will be displayed here -->
-            </div>
+        
+        <div class="file-operations">
+            <button onclick="exportToJsonFile()">Export Quotes</button>
+            <label for="importFile" class="file-label">Import Quotes</label>
+            <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+            <button onclick="syncWithServer()">Sync with Server</button>
         </div>
-
-        <div class="stats" id="stats">
-            <!-- Quote statistics will be shown here -->
+        
+        <div class="sync-status" id="syncStatus">
+            Last sync: Never
         </div>
     </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
